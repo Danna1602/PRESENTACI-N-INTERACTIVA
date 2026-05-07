@@ -1,0 +1,395 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gestión de Permanencia Académica - CISCO</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;800&display=swap');
+
+        :root {
+            --primary: #0f172a;
+            --accent-blue: #3b82f6;
+            --accent-orange: #f59e0b;
+        }
+
+        body {
+            background-color: #f1f5f9;
+            font-family: 'Inter', sans-serif;
+            color: #1e293b;
+        }
+
+        .glass-card {
+            background: rgba(255, 255, 255, 0.8);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+        }
+
+        .tab-btn {
+            position: relative;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .tab-btn.active::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 40%;
+            height: 4px;
+            background: var(--accent-blue);
+            border-radius: 10px 10px 0 0;
+        }
+
+        .action-card {
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .action-card:hover {
+            transform: scale(1.02);
+            border-color: var(--accent-blue);
+        }
+
+        .step-line {
+            background: linear-gradient(to bottom, #3b82f6 0%, #cbd5e1 100%);
+        }
+
+        .tab-content {
+            display: none;
+            animation: slideUp 0.5s ease-out forwards;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        @keyframes slideUp {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .pulse-red {
+            box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.7);
+            animation: pulse-red 2s infinite;
+        }
+
+        @keyframes pulse-red {
+            0% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.7); }
+            70% { box-shadow: 0 0 0 10px rgba(239, 68, 68, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0); }
+        }
+
+        .tooltip {
+            visibility: hidden;
+            opacity: 0;
+            transition: opacity 0.3s;
+            position: absolute;
+            bottom: 125%;
+            left: 50%;
+            transform: translateX(-50%);
+            white-space: nowrap;
+            z-index: 50;
+        }
+
+        .has-tooltip:hover .tooltip {
+            visibility: visible;
+            opacity: 1;
+        }
+
+        /* Logos responsive container */
+        .logo-container img {
+            max-height: 45px;
+            width: auto;
+            object-fit: contain;
+            filter: brightness(0) invert(1); /* Logos white for dark bg */
+            opacity: 0.9;
+            transition: opacity 0.3s;
+        }
+        .logo-container img:hover {
+            opacity: 1;
+        }
+    </style>
+</head>
+<body class="min-h-screen py-10 px-4">
+
+    <div class="max-w-6xl mx-auto">
+        <!-- Main Container -->
+        <div class="bg-white/70 backdrop-blur-xl rounded-[2.5rem] shadow-[0_20px_50px_rgba(0,0,0,0.1)] overflow-hidden border border-white">
+           
+            <!-- Header Section with Logos -->
+            <header class="relative bg-slate-900 p-8 text-white overflow-hidden">
+                <div class="absolute top-0 right-0 w-64 h-64 bg-blue-500/10 rounded-full -mr-32 -mt-32 blur-3xl"></div>
+               
+                <div class="relative z-10">
+                    <!-- Logos Row -->
+                    <div class="flex flex-wrap justify-between items-center gap-6 mb-8 border-b border-white/10 pb-6 logo-container">
+                        <div class="flex items-center gap-6">
+                            <img src=https://estudios.unad.edu.co/images/footer/logo-unad-acreditacion-min.png/1200px-Logo_UNAD.png" alt="Logo UNAD">
+                            <div class="h-8 w-px bg-white/20 hidden sm:block"></div>
+                            <span class="font-bold text-lg tracking-widest text-blue-400">ITP</span>
+                        </div>
+                        <div class="flex items-center gap-4">
+                            <img src="https://www.cisco.com/c/dam/m/en_us/training-events/netacad/course-catalog/docs/CiscoNetworkingAcademy_Logo.png" alt="Cisco NetAcad" style="max-height: 35px;">
+                        </div>
+                    </div>
+
+                    <div class="flex flex-col md:flex-row items-center gap-6">
+                        <div class="p-5 bg-white/10 rounded-2xl backdrop-blur-md border border-white/20">
+                            <i class="fas fa-network-wired text-5xl text-blue-400"></i>
+                        </div>
+                        <div class="text-center md:text-left">
+                            <h1 class="text-3xl md:text-4xl font-extrabold tracking-tight mb-2">
+                                GESTIÓN DE PERMANENCIA ACADÉMICA - <span class="text-blue-400 uppercase">CISCO</span>
+                            </h1>
+                            <p class="text-slate-400 text-lg max-w-2xl font-light italic">
+                                Sistema de acompañamiento estratégico para la retención y éxito estudiantil UNAD.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </header>
+
+            <!-- Interactive Navigation -->
+            <nav class="flex flex-wrap p-2 bg-slate-50 border-b border-slate-200">
+                <button onclick="showTab('seguimiento')" id="btn-seguimiento" class="tab-btn active flex-1 py-5 px-6 font-bold text-slate-800 rounded-xl hover:bg-white transition-all flex items-center justify-center gap-3">
+                    <i class="fas fa-chart-pie text-xl text-blue-600"></i>
+                    <span class="hidden sm:inline uppercase">Etapa de Seguimiento</span>
+                </button>
+                <button onclick="showTab('recuperacion')" id="btn-recuperacion" class="tab-btn flex-1 py-5 px-6 font-bold text-slate-500 rounded-xl hover:bg-white transition-all flex items-center justify-center gap-3">
+                    <i class="fas fa-life-ring text-xl text-orange-500"></i>
+                    <span class="hidden sm:inline uppercase">Etapa de Recuperación</span>
+                </button>
+            </nav>
+
+            <!-- Main Content Area -->
+            <main class="p-6 md:p-12">
+
+                <!-- Tab 1: Seguimiento Académico -->
+                <section id="tab-seguimiento" class="tab-content active">
+                    <div class="grid lg:grid-cols-3 gap-12">
+                       
+                        <div class="lg:col-span-2">
+                            <div class="mb-8">
+                                <h2 class="text-sm font-bold text-blue-600 uppercase tracking-widest mb-2">Monitoreo Preventivo</h2>
+                                <h3 class="text-3xl font-extrabold text-slate-800">Seguimiento Continuo de Progreso</h3>
+                                <p class="text-slate-500 mt-4 leading-relaxed">
+                                    Verificamos constantemente el avance y la permanencia para garantizar la culminación exitosa de los cursos Cisco NetAcad.
+                                </p>
+                            </div>
+
+                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                                <div class="action-card p-6 rounded-3xl bg-white border border-slate-100 shadow-sm">
+                                    <div class="w-12 h-12 bg-blue-100 rounded-xl flex items-center justify-center text-blue-600 mb-4">
+                                        <i class="fas fa-desktop"></i>
+                                    </div>
+                                    <h4 class="font-bold text-slate-800 mb-2">Ingreso y Progreso</h4>
+                                    <p class="text-sm text-slate-500">Verificación de acceso a plataforma y seguimiento de actividades académicas.</p>
+                                </div>
+                                <div class="action-card p-6 rounded-3xl bg-white border border-slate-100 shadow-sm">
+                                    <div class="w-12 h-12 bg-emerald-100 rounded-xl flex items-center justify-center text-emerald-600 mb-4">
+                                        <i class="fas fa-file-pdf"></i>
+                                    </div>
+                                    <h4 class="font-bold text-slate-800 mb-2">Suministro Técnico</h4>
+                                    <p class="text-sm text-slate-500">Entrega de manuales técnicos y guías de retención y permanencia.</p>
+                                </div>
+                                <div class="action-card p-6 rounded-3xl bg-white border border-slate-100 shadow-sm">
+                                    <div class="w-12 h-12 bg-amber-100 rounded-xl flex items-center justify-center text-amber-600 mb-4">
+                                        <i class="fas fa-chalkboard-teacher"></i>
+                                    </div>
+                                    <h4 class="font-bold text-slate-800 mb-2">Master Class</h4>
+                                    <p class="text-sm text-slate-500">Planeación de sesiones de profundización e invitaciones a eventos.</p>
+                                </div>
+                                <div class="action-card p-6 rounded-3xl bg-white border border-slate-100 shadow-sm">
+                                    <div class="w-12 h-12 bg-purple-100 rounded-xl flex items-center justify-center text-purple-600 mb-4">
+                                        <i class="fas fa-user-clock"></i>
+                                    </div>
+                                    <h4 class="font-bold text-slate-800 mb-2">Identificación</h4>
+                                    <p class="text-sm text-slate-500">Detección temprana de estudiantes inactivos para intervención inmediata.</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Columna Derecha: Frecuencia -->
+                        <div class="space-y-6">
+                            <div class="bg-slate-900 rounded-[2rem] p-8 text-white shadow-2xl relative overflow-hidden">
+                                <h4 class="text-xl font-bold mb-6 flex items-center gap-3">
+                                    <i class="fas fa-calendar-check text-blue-400"></i>
+                                    Frecuencia de Seguimiento
+                                </h4>
+                                <div class="space-y-4">
+                                    <div class="p-4 bg-white/5 border border-white/10 rounded-2xl flex justify-between items-center">
+                                        <span class="text-sm">Estudiante Activo</span>
+                                        <span class="text-xs font-bold bg-emerald-500/20 text-emerald-400 px-3 py-1 rounded-full">1 Semanal</span>
+                                    </div>
+                                    <div class="p-4 bg-white/5 border border-white/10 rounded-2xl flex justify-between items-center">
+                                        <span class="text-sm">Bajo Avance</span>
+                                        <span class="text-xs font-bold bg-amber-500/20 text-amber-400 px-3 py-1 rounded-full">2 Semanales</span>
+                                    </div>
+                                    <div class="p-4 bg-white/5 border border-white/10 rounded-2xl flex justify-between items-center">
+                                        <span class="text-sm">Riesgo Deserción</span>
+                                        <span class="text-xs font-bold bg-rose-500/20 text-rose-400 px-3 py-1 rounded-full pulse-red">Permanente</span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Canales de comunicación con interactividad específica -->
+                            <div class="bg-blue-50 rounded-[2rem] p-6 border border-blue-100">
+                                <h4 class="font-bold text-blue-900 mb-4 text-center">Canales Disponibles</h4>
+                                <div class="flex justify-center gap-4">
+                                    <!-- Correo Electrónico -->
+                                    <div class="relative has-tooltip">
+                                        <span class="tooltip bg-slate-800 text-white text-[10px] p-3 rounded-xl shadow-2xl leading-relaxed text-center">
+                                            comunicaciones.itp@unad.edu.co<br>Academias.itp@unad.edu.co
+                                        </span>
+                                        <button class="w-14 h-14 bg-white rounded-2xl flex items-center justify-center text-blue-600 shadow-sm hover:shadow-md hover:-translate-y-1 transition-all">
+                                            <i class="fas fa-envelope text-xl"></i>
+                                        </button>
+                                    </div>
+                                    <!-- Llamadas Teams -->
+                                    <div class="relative has-tooltip">
+                                        <span class="tooltip bg-slate-800 text-white text-[10px] p-3 rounded-xl shadow-2xl text-center">
+                                            Llamadas por Teams
+                                        </span>
+                                        <button class="w-14 h-14 bg-white rounded-2xl flex items-center justify-center text-indigo-500 shadow-sm hover:shadow-md hover:-translate-y-1 transition-all">
+                                            <i class="fas fa-phone-alt text-xl"></i>
+                                        </button>
+                                    </div>
+                                    <!-- Webex/Comunidad -->
+                                    <div class="relative has-tooltip">
+                                        <span class="tooltip bg-slate-800 text-white text-[10px] p-3 rounded-xl shadow-2xl text-center">
+                                            Grupos de Webex<br>Comunidad Virtual
+                                        </span>
+                                        <button class="w-14 h-14 bg-white rounded-2xl flex items-center justify-center text-cyan-600 shadow-sm hover:shadow-md hover:-translate-y-1 transition-all">
+                                            <i class="fas fa-users-rectangle text-xl"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                                <p class="text-[10px] text-center text-blue-400 mt-4 italic font-medium uppercase tracking-widest">Interactuar para ver datos</p>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Tab 2: Recuperación -->
+                <section id="tab-recuperacion" class="tab-content">
+                    <div class="max-w-4xl mx-auto text-center mb-16">
+                        <h2 class="text-sm font-bold text-orange-600 uppercase tracking-widest mb-2">Protocolo de Rescate</h2>
+                        <h3 class="text-3xl font-extrabold text-slate-800 mb-6">Etapa de Recuperación y Permanencia</h3>
+                       
+                        <div class="bg-rose-50 border-2 border-dashed border-rose-200 p-6 rounded-[2rem] max-w-2xl mx-auto text-left relative overflow-hidden">
+                            <div class="absolute -right-4 -top-4 opacity-5">
+                                <i class="fas fa-user-slash text-9xl"></i>
+                            </div>
+                            <h4 class="text-rose-700 font-extrabold text-sm mb-2 uppercase flex items-center gap-2">
+                                <i class="fas fa-exclamation-triangle"></i> Regla Crítica de Cierre
+                            </h4>
+                            <p class="text-rose-800 text-sm leading-relaxed">
+                                El protocolo de recuperación consiste estrictamente en <strong>4 llamadas</strong> programadas.
+                                <br><br>
+                                <span class="bg-rose-600 text-white px-2 py-0.5 rounded font-bold uppercase text-[10px]">Importante:</span> Si en la <strong>llamada 4</strong> no se obtiene respuesta, se procede inmediatamente al <strong>CIERRE DEL CASO Y BAJA DEFINITIVA</strong> del estudiante.
+                            </p>
+                        </div>
+                    </div>
+
+                    <div class="grid gap-8 max-w-4xl mx-auto">
+                        <!-- Step 1: Llamada 1 -->
+                        <div class="flex items-start gap-6 group">
+                            <div class="flex flex-col items-center">
+                                <div class="w-12 h-12 rounded-2xl bg-blue-600 text-white flex items-center justify-center font-black shadow-lg">1</div>
+                                <div class="w-0.5 h-24 bg-slate-200 group-hover:bg-blue-400 transition-colors"></div>
+                            </div>
+                            <div class="flex-1 bg-white p-6 rounded-3xl border border-slate-100 shadow-sm hover:shadow-md transition-all">
+                                <h5 class="text-blue-600 font-bold uppercase text-xs mb-1">Llamada 1</h5>
+                                <h6 class="text-xl font-bold text-slate-800 mb-3">Identificación de Dificultades</h6>
+                                <p class="text-sm text-slate-500 leading-relaxed italic">"Primer acercamiento para brindar orientación personalizada e invitarlos a retomar el curso."</p>
+                            </div>
+                        </div>
+
+                        <!-- Step 2: Llamada 2 -->
+                        <div class="flex items-start gap-6 group">
+                            <div class="flex flex-col items-center">
+                                <div class="w-12 h-12 rounded-2xl bg-blue-500 text-white flex items-center justify-center font-black shadow-lg">2</div>
+                                <div class="w-0.5 h-24 bg-slate-200 group-hover:bg-blue-400 transition-colors"></div>
+                            </div>
+                            <div class="flex-1 bg-white p-6 rounded-3xl border border-slate-100 shadow-sm hover:shadow-md transition-all">
+                                <h5 class="text-blue-500 font-bold uppercase text-xs mb-1">Llamada 2</h5>
+                                <h6 class="text-xl font-bold text-slate-800 mb-3">Notificación y Seguimiento</h6>
+                                <p class="text-sm text-slate-500 leading-relaxed mb-2">Segundo contacto telefónico reforzado con envío de correo electrónico de notificación.</p>
+                            </div>
+                        </div>
+
+                        <!-- Step 3: Llamada 3 -->
+                        <div class="flex items-start gap-6 group">
+                            <div class="flex flex-col items-center">
+                                <div class="w-12 h-12 rounded-2xl bg-blue-400 text-white flex items-center justify-center font-black shadow-lg">3</div>
+                                <div class="w-0.5 h-24 bg-slate-200 group-hover:bg-blue-400 transition-colors"></div>
+                            </div>
+                            <div class="flex-1 bg-white p-6 rounded-3xl border border-slate-100 shadow-sm hover:shadow-md transition-all">
+                                <h5 class="text-blue-400 font-bold uppercase text-xs mb-1">Llamada 3</h5>
+                                <h6 class="text-xl font-bold text-slate-800 mb-3">Acuerdos de Compromiso</h6>
+                                <p class="text-sm text-slate-500 leading-relaxed italic">"Definición de compromisos y fechas límite, junto con reforzamiento motivacional intensivo."</p>
+                            </div>
+                        </div>
+
+                        <!-- Step 4: Llamada 4 -->
+                        <div class="flex items-start gap-6 group">
+                            <div class="flex flex-col items-center">
+                                <div class="w-12 h-12 rounded-2xl bg-rose-600 text-white flex items-center justify-center font-black shadow-lg pulse-red">4</div>
+                            </div>
+                            <div class="flex-1 bg-rose-900 p-8 rounded-[2rem] text-white shadow-2xl relative overflow-hidden">
+                                <div class="absolute -right-4 -bottom-4 opacity-10">
+                                    <i class="fas fa-sign-out-alt text-8xl"></i>
+                                </div>
+                                <h5 class="text-rose-300 font-bold uppercase text-xs mb-1 tracking-widest">Llamada Final de Cierre</h5>
+                                <h6 class="text-2xl font-black mb-3 italic">Registro y Baja del Estudiante</h6>
+                                <p class="text-rose-100 text-sm font-medium leading-relaxed">
+                                    Si no se obtiene respuesta en esta cuarta llamada, se realiza el registro interno del caso y se procede a la baja administrativa automática por inactividad persistente.
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            </main>
+
+            <!-- Final Footer -->
+            <footer class="bg-white p-8 text-center border-t border-slate-100">
+                <p class="text-slate-400 text-xs font-bold uppercase tracking-widest mb-2">Protocolo Institucional UNAD - ITP - CISCO</p>
+                <p class="text-slate-300 text-[10px]">Gestión Académica Integral • Período 2026</p>
+            </footer>
+        </div>
+    </div>
+
+    <script>
+        function showTab(tabId) {
+            document.querySelectorAll('.tab-content').forEach(content => {
+                content.classList.remove('active');
+            });
+           
+            const btnSeg = document.getElementById('btn-seguimiento');
+            const btnRec = document.getElementById('btn-recuperacion');
+           
+            [btnSeg, btnRec].forEach(btn => {
+                btn.classList.remove('active', 'text-blue-800', 'text-blue-600', 'bg-white');
+                btn.classList.add('text-slate-500');
+            });
+
+            document.getElementById('tab-' + tabId).classList.add('active');
+            const activeBtn = document.getElementById('btn-' + tabId);
+            activeBtn.classList.add('active', 'bg-white');
+            activeBtn.classList.remove('text-slate-500');
+
+            if (tabId === 'seguimiento') {
+                activeBtn.classList.add('text-blue-800');
+            } else {
+                activeBtn.classList.add('text-blue-600');
+            }
+           
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+    </script>
+</body>
+</html>
